@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <context:component-scan base-package="lovo.j135_2.netctoss">
+    	<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    
+	<context:property-placeholder location="classpath:mysql.properties" ignore-unresolvable="true"/>
+	
+	<!-- 第一步，配置DBCP的数据源连接池 -->
+	<!-- destroy-method="close" 通知连接池，在自身如果需要销毁的时候，需要关闭
+	所有的连接 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}"></property>
+		<property name="url" value="${jdbc.url}"></property>
+		<property name="username" value="${jdbc.username}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+		<property name="initialSize" value="${jdbc.initialSize}"></property><!-- 初始连接数 -->
+		<property name="maxActive" value="${jdbc.maxActive}"></property><!-- 最大连接数 -->
+		<property name="minIdle" value="${jdbc.minIdle}"></property><!-- 最小空闲数 -->
+		<property name="maxIdle" value="20"></property><!-- 最大空闲数 -->
+		<property name="removeAbandonedTimeout" value="10"></property><!-- 超时时间10秒 -->
+		<property name="defaultAutoCommit" value="false"></property>
+		<property name="removeAbandoned" value="true"></property><!-- 是否回收超时连接 -->
+		<property name="maxWait" value="1000"></property><!-- 单位毫秒，超时等待时间 -->
+	  	<!-- 连接被抛弃时是否打印输出到日志中 -->  
+        <property name="logAbandoned" value="true"/> 
+	  	<!-- 每次空闲连接被回收时，需要检查的连接数量 -->  
+        <property name="numTestsPerEvictionRun" value="15"/>
+        <!-- 验证查询，获取当前连接数据库的时间 --> 
+		<property name="validationQuery" value="SELECT NOW() FROM DUAL"></property>
+	</bean>
+	
+	<!-- 第二步，配置SessionFactory,来至于mybatis-spring.jar -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 给类取类别名 -->
+		<property name="typeAliasesPackage" value="
+		lovo.j135_2.netctoss.usermag.beans">
+		</property>
+	</bean>
+	
+	<!-- 第三步，配置SQL映射器的扫描 -->
+	<bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="
+		lovo.j135_2.netctoss.usermag.mapper"></property>
+		
+		<!-- 将SQL映射与Session进行关联 -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+	
+	<!-- 配置事务管理器 -->
+	<bean id="txManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	
+	<!-- 不处理事务，则任何方法以非事务方式处理业务流程 -->
+	<!-- spring声明式事务管理方式（1）注解版，了解，不推荐 
+	<tx:annotation-driven transaction-manager="txManage"/>-->
+	
+	
+	<!-- spring声明式事务管理方式（2）切面版，企业应用开发推荐 --> 
+	<tx:advice id="txAdvice" transaction-manager="txManage">
+		<tx:attributes>
+			<tx:method name="*" read-only="true" />
+			<!-- propagation="REQUIRED" 事务的传播需要事务管理
+			 isolation="REPEATABLE_READ" 事务的隔离级别选择可重复读
+			 rollback-for="java.lang.Exception"异常的情况下回滚
+			 read-only="false" 将连接修改为可写
+			 -->
+			<tx:method name="save*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			<tx:method name="insert*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			<tx:method name="add*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			
+			<tx:method name="update*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			<tx:method name="modify*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			<tx:method name="change*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			
+			<tx:method name="delete*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			<tx:method name="remove*" propagation="REQUIRED" isolation="REPEATABLE_READ" rollback-for="java.lang.Exception" read-only="false"/>
+			
+			<tx:method name="find*" propagation="SUPPORTS"/>
+			<tx:method name="query*" propagation="SUPPORTS"/>
+			<tx:method name="get*" propagation="SUPPORTS"/>
+			<tx:method name="search*" propagation="SUPPORTS"/>
+			<tx:method name="select*" propagation="SUPPORTS"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+		<aop:pointcut expression="execution(* lovo.j135_2.netctoss.*mag.service.impl.*ServiceImpl.*(..))" id="serviceMethod"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="serviceMethod"/>
+	</aop:config>
+	<!-- 开启自动代理 -->
+	<aop:aspectj-autoproxy/>
+</beans>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration>
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="conversionPattern" value="%c %d{yyyy-MM-dd HH:mm:ss} --%p %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="STDOUT"/>
+			<param name="levelMax" value="STDOUT"/>
+		</filter>
+	</appender>
+	
+	<appender name="DEBUG" class="org.apache.log4j.RollingFileAppender">
+	<param name="File" value="d:/logs/ssm-debug.log"/>
+	<param name="Append" value="true"/>
+	<param name="MaxFileSize" value="10240KB"/><!-- 文件的最大容量 -->
+	<param name="MaxBackupIndex" value="10"/><!-- 日志最多记录时间，10天 -->
+		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="conversionPattern" value="%c %d{yyyy-MM-dd HH:mm:ss} --%p %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="STDOUT"/>
+			<param name="levelMax" value="STDOUT"/>
+		</filter>
+	</appender>
+	
+	<!-- 系统信息日志，通常用于生产阶段 -->
+	<appender name="INFO" class="org.apache.log4j.RollingFileAppender">
+	<param name="File" value="d:/logs/ssm-info.log"/>
+	<param name="Append" value="true"/>
+	<param name="MaxFileSize" value="10240KB"/><!-- 文件的最大容量 -->
+	<param name="MaxBackupIndex" value="10"/><!-- 日志最多记录时间，10天 -->
+		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="conversionPattern" value="%c %d{yyyy-MM-dd HH:mm:ss} --%p %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="INFO"/>
+			<param name="levelMax" value="INFO"/>
+		</filter>
+	</appender>
+	
+	<!-- 系统信息日志，通常用于生产阶段 -->
+	<appender name="WARN" class="org.apache.log4j.RollingFileAppender">
+	<param name="File" value="d:/logs/ssm-warn.log"/>
+	<param name="Append" value="true"/>
+	<param name="MaxFileSize" value="10240KB"/><!-- 文件的最大容量 -->
+	<param name="MaxBackupIndex" value="10"/><!-- 日志最多记录时间，10天 -->
+		
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="conversionPattern" value="%c %d{yyyy-MM-dd HH:mm:ss} --%p %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="WARN"/>
+			<param name="levelMax" value="WARN"/>
+		</filter>
+	</appender>
+	
+	<!-- 错误日志，通常用于生产阶段 -->
+	<appender name="ERROR" class="org.apache.log4j.RollingFileAppender">
+	<param name="File" value="d:/logs/ssm-error.log"/>
+	<param name="Append" value="true"/>
+	<param name="MaxFileSize" value="10240KB"/><!-- 文件的最大容量 -->
+	<param name="MaxBackupIndex" value="10"/><!-- 日志最多记录时间，10天 -->
+		
+		<layout class="org.apache.log4j.PatternLayout">
+		<!-- %c 代表类 -->
+			<param name="conversionPattern" value="%c %d{yyyy-MM-dd HH:mm:ss} --%p %m%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="levelMin" value="ERROR"/>
+			<param name="levelMax" value="ERROR"/>
+		</filter>
+	</appender>
+	
+	<root>
+		<priority value="INFO"></priority>
+		<appender-ref ref="STDOUT"/>
+		<appender-ref ref="DEBUG"/>
+		<appender-ref ref="INFO"/>
+		<appender-ref ref="WARN"/>
+		<appender-ref ref="ERROR"/>
+	</root>
+	
+</log4j:configuration>
